@@ -45,6 +45,7 @@ public class PaymentHistoryActivity extends AppCompatActivity {
         addTextToRow(headerRow, "Location", true);
         addTextToRow(headerRow, "Payment Method", true);
         addTextToRow(headerRow, "Cost (€)", true);
+        addTextToRow(headerRow, "Plates", true);
         tableLayout.addView(headerRow);
 
         // Data rows
@@ -56,7 +57,7 @@ public class PaymentHistoryActivity extends AppCompatActivity {
             addTextToRow(row, record.getLocation(), false);
             addTextToRow(row, record.getMethod(), false);
             addTextToRow(row, String.valueOf(record.getCost()), false);
-
+            addTextToRow(row, record.getCarPlate(), false);
             tableLayout.addView(row);
         }
     }
@@ -86,12 +87,14 @@ public class PaymentHistoryActivity extends AppCompatActivity {
                 long timestamp = Long.parseLong(entry.getKey());
                 String value = (String) entry.getValue();
                 // Format: method,cost,location
-                String[] parts = value.split(",", 3);
-                if (parts.length == 3) {
+                // Format now: method,cost,location,carPlate
+                String[] parts = value.split(",", 4);
+                if (parts.length == 4) {
                     String method = parts[0];
                     int cost = Integer.parseInt(parts[1]);
                     String location = parts[2];
-                    paymentHistory.add(new PaymentRecord(method, cost, location, timestamp));
+                    String carPlate = parts[3];
+                    paymentHistory.add(new PaymentRecord(method, cost, location, carPlate, timestamp));
                 }
             } catch (Exception e) {
                 // Ignore malformed entries

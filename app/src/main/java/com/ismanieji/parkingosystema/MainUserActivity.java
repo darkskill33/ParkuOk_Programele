@@ -250,7 +250,9 @@ public class MainUserActivity extends AppCompatActivity {
             reserveButton.setText("Reserve");
             reserveButton.setOnClickListener(v -> {
                 long now = System.currentTimeMillis();
-                activeReservation = new Reservation(locationName, now);
+                SharedPreferences prefs = getSharedPreferences("UserPrefs", MODE_PRIVATE);
+                String selectedCarPlate = prefs.getString("selected_car_plate", "XXX000");  // default empty if none selected
+                activeReservation = new Reservation(locationName, now, selectedCarPlate);
                 activeReminder.setVisibility(View.VISIBLE);
                 reserveButton.setText("End Reservation");
                 startReservationTimer();
@@ -285,6 +287,10 @@ public class MainUserActivity extends AppCompatActivity {
         int pricePerMinute = 1; // Define your rate here
         int totalCost = (int) Math.max(1, durationMinutes * pricePerMinute); // Minimum $1
 
+
+        SharedPreferences prefs = getSharedPreferences("user_prefs", MODE_PRIVATE);
+        String selectedPlate = prefs.getString("selected_plate", "No Plate");
+
         new AlertDialog.Builder(this)
                 .setTitle("End Reservation")
                 .setMessage("End reservation at " + activeReservation.getLocationName() + "?\nEstimated Cost: €" + totalCost)
@@ -292,13 +298,15 @@ public class MainUserActivity extends AppCompatActivity {
                     Reservation completed = new Reservation(
                             activeReservation.getLocationName(),
                             activeReservation.getStartTime(),
-                            endTime
+                            endTime,
+                            selectedPlate
                     );
                     reservationHistory.add(completed);
 
-                    SharedPreferences prefs = getSharedPreferences("PaymentPrefs", MODE_PRIVATE);
-                    String paymentMethod = prefs.getString("selected_payment_method", "Card");
-                    savePaymentHistory(paymentMethod, totalCost, completed.getLocationName());
+                    SharedPreferences paymentPrefs = getSharedPreferences("PaymentPrefs", MODE_PRIVATE);
+                    String paymentMethod = paymentPrefs.getString("SelectedPaymentMethod", "Card");
+                    savePaymentHistory(paymentMethod, totalCost, completed.getLocationName(), selectedPlate); // updated method
+
 
                     activeReservation = null;
                     stopReservationTimer();
@@ -412,16 +420,16 @@ public class MainUserActivity extends AppCompatActivity {
         mapView.invalidate();
     }
 
-    private void savePaymentHistory(String method, int cost, String location) {
+    private void savePaymentHistory(String method, int cost, String location, String carPlate) {
         SharedPreferences prefs = getSharedPreferences("PaymentHistory", MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
 
-        String entry = method + "," + cost + "," + location;
+        // Save with plate info added (comma separated)
+        String entry = method + "," + cost + "," + location + "," + carPlate;
         long timestamp = System.currentTimeMillis();
 
         editor.putString(String.valueOf(timestamp), entry);
         editor.apply();
     }
-
 
 }

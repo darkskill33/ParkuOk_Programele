@@ -73,4 +73,5 @@ public class PaymentMethodsActivity extends AppCompatActivity {
         // Mock check - replace with actual logic if you store cards
         return sharedPreferences.getBoolean("card_added", false);
     }
+
 }
