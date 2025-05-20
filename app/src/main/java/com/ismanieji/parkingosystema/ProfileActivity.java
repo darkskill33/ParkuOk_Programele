@@ -16,7 +16,7 @@ import retrofit2.Response;
 public class ProfileActivity extends AppCompatActivity {
 
     private TextView usernameTextView, emailTextView;
-    private Button logoutButton, backButton;
+    private Button logoutButton, backButton, editProfileButton;
     private String authToken;
 
     @Override
@@ -28,15 +28,9 @@ public class ProfileActivity extends AppCompatActivity {
         emailTextView = findViewById(R.id.emailTextView);
         logoutButton = findViewById(R.id.logoutButton);
         backButton = findViewById(R.id.back_button);
+        editProfileButton = findViewById(R.id.editProfileButton);
 
-
-        backButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
-
+        backButton.setOnClickListener(v -> finish());
 
         SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
         authToken = sharedPreferences.getString("auth_token", null);
@@ -49,6 +43,20 @@ public class ProfileActivity extends AppCompatActivity {
         }
 
         logoutButton.setOnClickListener(v -> performLogout());
+
+        editProfileButton.setOnClickListener(v -> {
+            // Pass current email to edit activity
+            Intent intent = new Intent(ProfileActivity.this, EditProfileActivity.class);
+            intent.putExtra("email", emailTextView.getText().toString().replace("Email: ", ""));
+            startActivity(intent);
+        });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Refresh profile info after coming back from edit screen
+        fetchUserProfile();
     }
 
     private void fetchUserProfile() {
@@ -82,12 +90,9 @@ public class ProfileActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
                 if (response.isSuccessful()) {
-                    // Clear token
                     SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
                     sharedPreferences.edit().remove("auth_token").apply();
-
-                    // Redirect to login
-                    startActivity(new Intent(ProfileActivity.this, LoginActivity.class));
+                    startActivity(new Intent(ProfileActivity.this, MainActivity.class));
                     finish();
                 } else {
                     Toast.makeText(ProfileActivity.this, "Logout failed", Toast.LENGTH_SHORT).show();

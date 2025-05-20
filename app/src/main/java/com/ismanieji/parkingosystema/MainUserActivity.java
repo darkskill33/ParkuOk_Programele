@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
@@ -37,7 +38,7 @@ public class MainUserActivity extends AppCompatActivity {
     private ImageButton searchButton;
     private Button reserveButton;
     private TextView activeReminder;
-    private ImageButton favoritesButton;
+    private ImageButton favoritesButton, plateButton;
     private ArrayList<Marker> parkingMarkers = new ArrayList<>();
     private List<Reservation> reservationHistory = new ArrayList<>();
     private Reservation activeReservation = null;
@@ -127,6 +128,13 @@ public class MainUserActivity extends AppCompatActivity {
             startReservationTimer();
             Toast.makeText(this, "Reminder: Active reservation at " + activeReservation.getLocationName(), Toast.LENGTH_LONG).show();
         }
+
+        plateButton = findViewById(R.id.plate_button);
+        plateButton.setOnClickListener(v -> {
+            Intent intent = new Intent(this, CarPlatesActivity.class);
+            startActivity(intent);
+        });
+
     }
 
     private void handleNavigationItem(@NonNull MenuItem item) {
@@ -272,27 +280,37 @@ public class MainUserActivity extends AppCompatActivity {
 
 
     private void showEndReservationDialog() {
+        long endTime = System.currentTimeMillis();
+        long durationMinutes = (endTime - activeReservation.getStartTime()) / (1000 * 60);
+        int pricePerMinute = 1; // Define your rate here
+        int totalCost = (int) Math.max(1, durationMinutes * pricePerMinute); // Minimum $1
+
         new AlertDialog.Builder(this)
                 .setTitle("End Reservation")
-                .setMessage("End reservation at " + activeReservation.getLocationName() + "?")
+                .setMessage("End reservation at " + activeReservation.getLocationName() + "?\nEstimated Cost: €" + totalCost)
                 .setPositiveButton("End", (dialog, which) -> {
-                    long endTime = System.currentTimeMillis();
                     Reservation completed = new Reservation(
                             activeReservation.getLocationName(),
                             activeReservation.getStartTime(),
                             endTime
                     );
                     reservationHistory.add(completed);
-                    Toast.makeText(this, "Parking at " + completed.getLocationName() + " ended.", Toast.LENGTH_SHORT).show();
+
+                    SharedPreferences prefs = getSharedPreferences("PaymentPrefs", MODE_PRIVATE);
+                    String paymentMethod = prefs.getString("selected_payment_method", "Card");
+                    savePaymentHistory(paymentMethod, totalCost, completed.getLocationName());
 
                     activeReservation = null;
                     stopReservationTimer();
                     cancelReminderNotification();
                     reserveButton.setVisibility(View.GONE);
+
                 })
                 .setNegativeButton("Cancel", null)
                 .show();
     }
+
+
 
     private void showSelectParkingPrompt() {
         new AlertDialog.Builder(this)
@@ -394,6 +412,16 @@ public class MainUserActivity extends AppCompatActivity {
         mapView.invalidate();
     }
 
+    private void savePaymentHistory(String method, int cost, String location) {
+        SharedPreferences prefs = getSharedPreferences("PaymentHistory", MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+
+        String entry = method + "," + cost + "," + location;
+        long timestamp = System.currentTimeMillis();
+
+        editor.putString(String.valueOf(timestamp), entry);
+        editor.apply();
+    }
 
 
 }

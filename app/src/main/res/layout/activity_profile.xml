@@ -43,4 +43,11 @@
         android:layout_marginTop="10dp"
         android:text="Back" />
 
+    <Button
+        android:id="@+id/editProfileButton"
+        android:layout_width="256dp"
+        android:layout_height="68dp"
+        android:text="Edit Profile"
+        android:layout_marginTop="10dp" />
+
 </LinearLayout>

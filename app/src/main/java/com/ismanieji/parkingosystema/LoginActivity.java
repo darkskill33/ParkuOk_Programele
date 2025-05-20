@@ -53,16 +53,19 @@ public class LoginActivity extends AppCompatActivity {
 
     private void performLogin(String username, String password) {
         ApiService apiService = RetrofitClient.getApiService();
-
         LoginRequest loginRequest = new LoginRequest(username, password);
         Call<LoginResponse> call = apiService.loginUser(loginRequest);
 
         call.enqueue(new Callback<LoginResponse>() {
             @Override
             public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
-                if (response.isSuccessful() && response.body() != null) {
+                if ((response.isSuccessful() && response.body() != null)) {
+
                     String token = response.body().getToken();
                     Log.d("Login Success", "Token: " + token);
+
+                    SharedPreferences prefs = getSharedPreferences("PaymentPrefs", MODE_PRIVATE);
+                    prefs.edit().remove("card_added").apply();
 
                     // Save token in SharedPreferences
                     SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
