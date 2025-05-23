@@ -48,6 +48,7 @@
 
         <activity
             android:name=".ProfileActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"
             android:exported="false" />
 
         <activity
@@ -59,6 +60,31 @@
             android:exported="true" />
 
         <activity android:name=".ReservationHistoryActivity" />
+
+        <activity
+            android:name=".PaymentMethodsActivity"
+            android:theme="@style/Theme.MaterialComponents.DayNight.NoActionBar"
+            android:exported="false" />
+
+        <activity
+            android:name=".AddCardActivity"
+            android:theme="@style/Theme.MaterialComponents.DayNight.NoActionBar"
+            android:exported="false" />
+
+        <activity
+            android:name=".PaymentHistoryActivity"
+            android:theme="@style/Theme.MaterialComponents.DayNight.NoActionBar"
+            android:exported="false" />
+
+        <activity
+            android:name=".EditProfileActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"
+            android:exported="false" />
+
+        <activity
+            android:name=".CarPlatesActivity"
+            android:theme="@style/Theme.MaterialComponents.DayNight.NoActionBar"
+            android:exported="false" />
 
     </application>
 

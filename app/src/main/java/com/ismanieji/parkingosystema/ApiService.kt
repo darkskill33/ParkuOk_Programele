@@ -5,7 +5,8 @@ import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.POST
-import retrofit2.http.DELETE
+import retrofit2.http.PUT
+
 
 interface ApiService {
     @POST("users/login/")
@@ -19,6 +20,13 @@ interface ApiService {
 
     @POST("users/logout/")  // Adjust the endpoint based on your Django backend
     fun logoutUser(@Header("Authorization") token: String): Call<Void>
+
+    @PUT("users/profile/update/")
+    fun updateProfile(
+        @Header("Authorization") token: String?,
+        @Body request: UpdateProfileRequest?
+    ): Call<Void?>?
+
 }
 
 

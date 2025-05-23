@@ -4,17 +4,22 @@ public class Reservation {
     private String locationName;
     private long startTime;
     private long endTime;
+    private String carPlate;  // NEW
 
-    public Reservation(String locationName, long startTime) {
+    // Constructor for active reservation (no end time yet)
+    public Reservation(String locationName, long startTime, String carPlate) {
         this.locationName = locationName;
         this.startTime = startTime;
         this.endTime = -1;
+        this.carPlate = carPlate;
     }
 
-    public Reservation(String locationName, long startTime, long endTime) {
+    // Constructor for completed reservation
+    public Reservation(String locationName, long startTime, long endTime, String carPlate) {
         this.locationName = locationName;
         this.startTime = startTime;
         this.endTime = endTime;
+        this.carPlate = carPlate;
     }
 
     public String getLocationName() {
@@ -29,9 +34,11 @@ public class Reservation {
         return endTime;
     }
 
+    public String getCarPlate() {  // NEW getter
+        return carPlate;
+    }
+
     public boolean isActive() {
         return endTime < 0;
     }
 }
-
-

@@ -56,10 +56,10 @@ public class RegisterActivity extends ComponentActivity {
         // Directly use getApiService() without calling create() again
         ApiService apiService = RetrofitClient.getApiService();
         Call<RegisterResponse> call = apiService.registerUser(new RegisterRequest(username, password, firstName, lastName, email));
-
         call.enqueue(new Callback<RegisterResponse>() {
             @Override
             public void onResponse(Call<RegisterResponse> call, Response<RegisterResponse> response) {
+
                 if (response.isSuccessful()) {
                     Toast.makeText(RegisterActivity.this, "Registration Success!", Toast.LENGTH_LONG).show();
                     Intent intent = new Intent( RegisterActivity.this, LoginActivity.class);
